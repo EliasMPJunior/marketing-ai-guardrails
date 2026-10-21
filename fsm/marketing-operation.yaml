@@ -1,0 +1,78 @@
+statechart:
+  name: Marketing operation
+  description: >
+    Stub of the validation loop described in the README: a marketing brief is
+    interpreted, validated against policy and consent, turned into campaign
+    content, revalidated against evidence, and published only after human
+    approval. Correction, rejection, and escalation are explicit paths.
+  preamble: |
+    # Verified facts produced by capabilities and independent checks. The
+    # statechart only verifies them; it never establishes them itself.
+    brief_structured = setdefault("brief_structured", False)
+    audience_verified = setdefault("audience_verified", False)
+    offer_compliant = setdefault("offer_compliant", False)
+    claims_grounded = setdefault("claims_grounded", False)
+    review_decision = setdefault("review_decision", None)
+
+  root state:
+    name: root
+    initial: brief_received
+    states:
+      - name: brief_received
+        transitions:
+          - target: brief_structured
+            event: structure_brief
+            guard: brief_structured
+          - target: rejected
+            event: reject
+            guard: not brief_structured
+
+      - name: brief_structured
+        transitions:
+          - target: campaign_validated
+            event: validate_campaign
+            guard: brief_structured and audience_verified and offer_compliant
+
+      - name: campaign_validated
+        transitions:
+          - target: content_generated
+            event: generate_content
+            guard: audience_verified and offer_compliant
+          # Correction path: the validation loop sends the case back to the
+          # structured brief instead of advancing as if it had passed.
+          - target: brief_structured
+            event: revise_brief
+
+      - name: content_generated
+        transitions:
+          - target: content_validated
+            event: validate_content
+            guard: claims_grounded
+          - target: human_review
+            event: escalate
+
+      - name: content_validated
+        transitions:
+          - target: human_review
+            event: request_human_review
+
+      - name: human_review
+        contract:
+          - always: review_decision in (None, "approve", "reject")
+        transitions:
+          - target: published
+            event: approve
+            guard: review_decision == "approve"
+          - target: rejected
+            event: reject
+            guard: review_decision == "reject"
+          - target: content_generated
+            event: revise_content
+
+      - name: published
+        type: final
+        contract:
+          - before: audience_verified and offer_compliant and claims_grounded
+
+      - name: rejected
+        type: final
