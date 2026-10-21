@@ -184,7 +184,8 @@ def run_fsm(prompt_text: str) -> int:
         "[bold cyan]Marketing AI Guardrails[/]\n"
         "[dim]Running the marketing operation statechart[/]",
         border_style="cyan", title="FSM"))
-    return 0
+    executor_path: Path = Path(__file__).parent / "fsm" / "main" / "executor.py"
+    return subprocess.call([sys.executable, str(executor_path)])
 
 
 def main() -> int:
@@ -229,7 +230,10 @@ def main() -> int:
         "[dim]Virtual environment:[/] [cyan].venv[/]\n"
         "[dim]To activate:[/] [white]source .venv/bin/activate[/]",
         border_style="green", title="Ready"))
-    return ask_claude(prompt_text)
+    claude_code: int = ask_claude(prompt_text)
+    if claude_code != 0:
+        return claude_code
+    return run_fsm(prompt_text)
 
 
 if __name__ == "__main__":
