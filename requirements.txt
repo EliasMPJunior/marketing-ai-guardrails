@@ -1,0 +1,14 @@
+# Finite-state machine / statechart interpreter
+sismic
+
+# RDF graphs, ontologies, and SPARQL queries
+rdflib
+
+# SHACL validation of semantic data
+pyshacl
+
+# YAML-defined statecharts
+PyYAML
+
+# Validation scenarios and automated tests
+pytest
