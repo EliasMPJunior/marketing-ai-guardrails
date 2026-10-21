@@ -41,6 +41,16 @@ from textual.app import App, ComposeResult
 from textual.widgets import Footer, Header, LoadingIndicator, RichLog, Static
 
 requirements = Path(sys.argv[1])
+prompt_path = Path(sys.argv[2])
+
+
+def load_prompt() -> str:
+    content = prompt_path.read_text(encoding="utf-8").strip()
+    if not content:
+        raise ValueError(f"Prompt file is empty: {prompt_path}")
+    return content
+
+
 command = [sys.executable, "-m", "pip", "install", "--disable-pip-version-check",
            "--no-input", "--progress-bar", "off", "-r", str(requirements)]
 console = Console()
@@ -48,7 +58,9 @@ console = Console()
 
 class Installer(App):
     TITLE = "Marketing AI Guardrails"
-    SUB_TITLE = "Python environment setup"
+    SUB_TITLE = "Setup and challenge"
+    BINDINGS = [("q", "close_prompt", "Close"), ("enter", "close_prompt", "Continue")]
+    prompt_ready = False
     CSS = """
     Screen { background: #0d1727; color: #e6f1ff; }
     #banner { height: 3; content-align: center middle; background: #13344b;
@@ -57,6 +69,14 @@ class Installer(App):
     #spinner { height: 3; color: #53e9d6; }
     #details { height: 1fr; margin: 1 2; border: round #238eaa;
                background: #101f31; padding: 0 1; }
+    #challenge {
+        display: none;
+        height: 1fr;
+        margin: 1 2;
+        padding: 1 2;
+        content-align: center middle;
+        background: #112d3b;
+    }
     Footer { background: #13344b; }
     """
 
@@ -66,10 +86,15 @@ class Installer(App):
         yield Static("[1/2] Installing project dependencies...", id="message")
         yield LoadingIndicator(id="spinner")
         yield RichLog(id="details", highlight=False, wrap=True, auto_scroll=True)
+        yield Static("", id="challenge")
         yield Footer()
 
     def on_mount(self) -> None:
         self.run_worker(self.install(), exclusive=True)
+
+    def action_close_prompt(self) -> None:
+        if self.prompt_ready:
+            self.exit(return_code=0)
 
     async def install(self) -> None:
         details = self.query_one("#details", RichLog)
@@ -92,14 +117,35 @@ class Installer(App):
             code = 1
 
         self.query_one("#spinner", LoadingIndicator).display = False
-        if code == 0:
-            message.update("[2/2] ✓ Environment ready. All dependencies installed.")
-            details.write(Text("✓ Setup complete", style="bold green"))
-        else:
+        if code != 0:
             message.update("✗ Dependency installation failed. Review the log above.")
             details.write(Text(f"✗ pip exited with status {code}", style="bold red"))
-        await asyncio.sleep(1.2)
-        self.exit(return_code=code)
+            await asyncio.sleep(1.2)
+            self.exit(return_code=code)
+            return
+
+        try:
+            prompt_text = load_prompt()
+        except (OSError, ValueError) as error:
+            message.update("✗ Could not load prompt.txt.")
+            details.write(Text(str(error), style="bold red"))
+            await asyncio.sleep(1.2)
+            self.exit(return_code=1)
+            return
+
+        details.display = False
+        challenge = self.query_one("#challenge", Static)
+        challenge.update(Panel(
+            Text(prompt_text, style="bold bright_white", justify="center"),
+            title="[bold bright_cyan]◆  THE CHALLENGE  ◆[/]",
+            subtitle="[dim]prompt.txt[/]",
+            border_style="bright_cyan",
+            padding=(2, 3),
+            expand=True,
+        ))
+        challenge.display = True
+        message.update("✓ Setup complete. Challenge loaded. Press Enter or Q to close.")
+        self.prompt_ready = True
 
 
 def run_without_tui() -> int:
@@ -111,7 +157,12 @@ def run_without_tui() -> int:
     return code
 
 
-if sys.stdin.isatty() and sys.stdout.isatty() and os.environ.get("TERM") not in (None, "dumb"):
+interactive = (
+    sys.stdin.isatty()
+    and sys.stdout.isatty()
+    and os.environ.get("TERM") not in (None, "dumb")
+)
+if interactive:
     app = Installer()
     app.run(inline=True)
     exit_code = app.return_code or 0
@@ -119,6 +170,19 @@ else:
     exit_code = run_without_tui()
 
 if exit_code == 0:
+    if not interactive:
+        try:
+            prompt_text = load_prompt()
+        except (OSError, ValueError) as error:
+            console.print(f"[bold red]✗ Unable to read prompt.txt: {error}[/]")
+            sys.exit(1)
+        console.print(Panel(
+            Text(prompt_text, style="bold bright_white", justify="center"),
+            border_style="bright_cyan",
+            title="[bold bright_cyan]◆  THE CHALLENGE  ◆[/]",
+            subtitle="prompt.txt",
+            padding=(1, 3),
+        ))
     console.print(Panel.fit(
         "[bold green]✓ Python dependencies installed successfully[/]\n"
         "[dim]Virtual environment:[/] [cyan].venv[/]\n"
@@ -130,4 +194,4 @@ else:
         border_style="red", title="Error"))
 sys.exit(exit_code)
 PY
-)" "${REQUIREMENTS}"
+)" "${REQUIREMENTS}" "${ROOT_DIR}/prompt.txt"
