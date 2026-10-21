@@ -42,14 +42,24 @@ statechart:
       - name: operation_scored
         contract:
           - before: is_operation_scored
+        # Entry action: runs the score threshold check from
+        # states/operation_scored/guard.py and records the resulting fact.
+        on entry: is_operation_validated = check_single_strong_steps()
+        transitions:
+          - target: operation_validated
+            guard: is_operation_validated
+
+      - name: operation_validated
+        contract:
+          - before: is_operation_validated
         transitions:
           - target: published
-            guard: is_operation_scored
+            guard: is_operation_validated
 
       - name: published
         type: final
         contract:
-          - before: is_operation_scored
+          - before: is_operation_validated
 
       - name: rejected
         type: final
