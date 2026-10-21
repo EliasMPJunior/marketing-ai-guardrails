@@ -1,4 +1,4 @@
-"""Capability invoked when ``operation_scored`` finds no single strong step per task.
+"""Capability invoked when ``operation_scored`` finds a task with no strong step.
 
 The capability shows an alert on screen, with Textual when the terminal is
 interactive, explaining which tasks the scores could not resolve and that the
@@ -41,13 +41,13 @@ def build_message(brief_path: Union[str, Path]) -> str:
         reason: str = f"The step scores in {guard.SCORES_FILE_NAME} are missing or unreadable."
     else:
         unresolved: List[str] = [
-            f"  - task {entry['id']}: {guard.count_strong_steps(entry)} step(s)"
+            f"  - task {entry['id']}"
             for entry in scores
-            if guard.count_strong_steps(entry) != 1
+            if guard.count_strong_steps(entry) == 0
         ]
         reason = (
-            f"Every task needs exactly one step scored {guard.MIN_SCORE} or more, "
-            "but these tasks have a different count:\n" + "\n".join(unresolved)
+            f"Every task needs at least one step scored {guard.MIN_SCORE} or more, "
+            "but no step is close enough to these tasks:\n" + "\n".join(unresolved)
         )
     return (
         "The operation could not be matched automatically to the workflow.\n\n"

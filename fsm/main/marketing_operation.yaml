@@ -44,13 +44,25 @@ statechart:
           - before: is_operation_scored
         # Entry action: runs the score threshold check from
         # states/operation_scored/guard.py and records the resulting fact.
-        on entry: is_operation_validated = check_single_strong_steps()
+        on entry: |
+          is_operation_validated = check_single_strong_steps()
+          is_operation_splittable = check_strong_steps()
         transitions:
           - target: operation_validated
             guard: is_operation_validated
+          # At least one strong step per task, but some tasks have several.
+          - target: operation_split
+            guard: is_operation_splittable and not is_operation_validated
+            action: is_operation_split = split_tasks()
+          # Some task has no strong step at all.
           - target: operation_unresolved
-            guard: not is_operation_validated
+            guard: not is_operation_splittable
             action: alert_human_tasks()
+
+      - name: operation_split
+        type: final
+        contract:
+          - before: is_operation_split
 
       - name: operation_validated
         contract:

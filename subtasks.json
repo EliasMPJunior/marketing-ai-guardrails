@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "task": "Identify courses from the existing catalog suitable for the Black Friday promotion, listing title, regular price, proposed promotional offer, and justification for each",
+    "objective": "Select and document a shortlist of promotable courses to anchor the campaign",
+    "subtasks": []
+  },
+  {
+    "id": 2,
+    "task": "Propose target audiences and draft personalized Black Friday email campaigns in English (subject line, preview text, promotional message, call to action) for each audience",
+    "objective": "Produce ready-to-send, audience-specific email content to drive campaign engagement",
+    "subtasks": [
+      {
+        "id": "2.1",
+        "task": "Select the target audiences for the Black Friday campaign",
+        "objective": "Define audiences that fit the selected courses",
+        "step": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#SelectAudience"
+      },
+      {
+        "id": "2.2",
+        "task": "Draft personalized Black Friday emails in English for each audience",
+        "objective": "Produce subject line, preview text, message and call to action per audience",
+        "step": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#GenerateContent"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "task": "Verify that proposed offers comply with pricing/discount policies, that course claims are backed by actual course descriptions, and that recipients are eligible to receive marketing messages",
+    "objective": "Ensure the campaign is policy-compliant, factually accurate, and legally sendable before launch",
+    "subtasks": [
+      {
+        "id": "3.1",
+        "task": "Verify that the proposed offers comply with pricing and discount policies",
+        "objective": "Confirm every offer is within the approved policy",
+        "step": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#ValidateOffers"
+      },
+      {
+        "id": "3.2",
+        "task": "Verify that course claims are backed by the course descriptions",
+        "objective": "Confirm no claim goes beyond what the descriptions support",
+        "step": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#VerifyContent"
+      },
+      {
+        "id": "3.3",
+        "task": "Verify that recipients are eligible to receive marketing messages",
+        "objective": "Confirm consent for every recipient",
+        "step": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#ValidateConsent"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "task": "Prepare the final Black Friday campaign proposal combining the selected courses and email campaigns",
+    "objective": "Increase course enrollments during Black Friday",
+    "subtasks": []
+  }
+]
