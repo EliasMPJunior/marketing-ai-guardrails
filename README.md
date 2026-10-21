@@ -125,4 +125,7 @@ Human oversight remains necessary when the conditions themselves require judgmen
 
 ## Status
 
+
+This text was originally crafted by a human (me), subsequently expanded and developed with ChatGPT, and finally reviewed by me.
+
 This repository is the starting point for the exercise. Design decisions, examples, implementation, test cases, and observed limitations will be documented as the work progresses.
