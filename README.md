@@ -104,6 +104,8 @@ A confident score is not trusted as truth: it only chooses between paths, and on
 People are required wherever the conditions themselves need judgment:
 
 - **Today:** `operation_unresolved` is the hand-off. The alert states which tasks could not be resolved and why, and that the demand can be integrated into the human tasks workflow. The system stops there instead of guessing.
+
+  ![Alert shown by operation_unresolved](docs/operation_unresolved_alert.png)
 - **Not automated, by design:** the threshold (`MIN_SCORE`), the number of split rounds and the ontology are rules that people own and review; the statechart enforces them but does not decide them.
 - **Planned:** approval of offers and claims, adjudication of eligibility doubts and the final authorization before publication (see [Future steps](#future-steps)).
 
@@ -154,7 +156,7 @@ The suite was **written by Claude Code**. It has two parts:
 - `tests/test_scenarios.py` runs the real statechart, guards and capabilities end to end, with the expected outcome of each scenario stated in advance. It covers the valid demand (split, rescored, published), a demand with one strong step per task, an invalid brief, a task without a strong step, a split that does not resolve the ambiguity, scores that name a step missing from the ontology, a tasks listing that breaks its contract, garbage and invented steps coming from Claude Code, a failing and an absent Claude Code, and the consistency of `path.json`.
 - `tests/test_guards.py` tests the objective checks on their own: the inclusive threshold, the "at least one" and "exactly one" guards, unusable or missing scores, and the brief guard.
 
-Each scenario runs in a temporary copy of `fsm/`, `ontology/` and `mocks/`, changing the mocks it needs, and a fake `claude` executable, so the tests never touch the files in `mocks/` and never spend tokens.
+Each scenario runs in a temporary copy of `fsm/`, `ontology/` and `mocks/`, where it changes the mocks it needs. A fake `claude` executable stands in for Claude Code. The tests therefore never touch the files in `mocks/` and never spend tokens.
 
 ## Repository layout
 
@@ -172,6 +174,7 @@ fsm/states/<state>/
 mocks/                         Mock outputs of the AI capabilities (see above)
 discussions.md                 Design decisions
 tests/                         Scenario and guard tests (written by Claude Code)
+docs/                          Screenshots used in this README
 ```
 
 ## Future steps
