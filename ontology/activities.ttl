@@ -20,150 +20,149 @@
 # Input and output variables
 # --------------------------------------------------
 
-:brief a p-plan:Variable .
-:catalog a p-plan:Variable .
-:candidates a p-plan:Variable .
-:eligibleProducts a p-plan:Variable .
-:selectedProducts a p-plan:Variable .
-:pricingPolicy a p-plan:Variable .
-:proposedOffers a p-plan:Variable .
-:validatedOffers a p-plan:Variable .
-:audience a p-plan:Variable .
-:consentRecords a p-plan:Variable .
-:eligibleAudience a p-plan:Variable .
-:generatedContent a p-plan:Variable .
-:validatedContent a p-plan:Variable .
-:authorization a p-plan:Variable .
-:deliveryReport a p-plan:Variable .
+:Brief a p-plan:Variable .
+:Catalog a p-plan:Variable .
+:Candidates a p-plan:Variable .
+:EligibleProducts a p-plan:Variable .
+:SelectedProducts a p-plan:Variable .
+:PricingPolicy a p-plan:Variable .
+:ProposedOffers a p-plan:Variable .
+:ValidatedOffers a p-plan:Variable .
+:Audience a p-plan:Variable .
+:ConsentRecords a p-plan:Variable .
+:EligibleAudience a p-plan:Variable .
+:GeneratedContent a p-plan:Variable .
+:ValidatedContent a p-plan:Variable .
+:Authorization a p-plan:Variable .
+:DeliveryReport a p-plan:Variable .
 
 # --------------------------------------------------
 # Planning
 # --------------------------------------------------
 
-:interpretBrief
+:InterpretBrief
     a p-plan:Step, schema:Action ;
     rdfs:label "Interpret marketing brief"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:hasInputVar :brief .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:hasInputVar :Brief .
 
 # --------------------------------------------------
 # Product discovery and selection
 # --------------------------------------------------
 
-:discoverProducts
+:DiscoverProducts
     a p-plan:Step, schema:SearchAction ;
     rdfs:label "Discover available products"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :interpretBrief ;
-    p-plan:hasInputVar :catalog ;
-    p-plan:hasOutputVar :candidates .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :InterpretBrief ;
+    p-plan:hasInputVar :Catalog ;
+    p-plan:hasOutputVar :Candidates .
 
-:evaluateProducts
+:EvaluateProducts
     a p-plan:Step, schema:CheckAction ;
     rdfs:label "Evaluate product eligibility"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :discoverProducts ;
-    p-plan:hasInputVar :candidates ;
-    p-plan:hasOutputVar :eligibleProducts .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :DiscoverProducts ;
+    p-plan:hasInputVar :Candidates ;
+    p-plan:hasOutputVar :EligibleProducts .
 
-:selectProducts
+:SelectProducts
     a p-plan:Step, schema:ChooseAction ;
     rdfs:label "Select products for promotion"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :evaluateProducts ;
-    p-plan:hasInputVar :eligibleProducts ;
-    p-plan:hasOutputVar :selectedProducts .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :EvaluateProducts ;
+    p-plan:hasInputVar :EligibleProducts ;
+    p-plan:hasOutputVar :SelectedProducts .
 
 # --------------------------------------------------
 # Commercial offers
 # --------------------------------------------------
 
-:createOffers
+:CreateOffers
     a p-plan:Step, schema:CreateAction ;
     rdfs:label "Create promotional offers"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :selectProducts ;
-    p-plan:hasInputVar :selectedProducts ;
-    p-plan:hasOutputVar :proposedOffers .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :SelectProducts ;
+    p-plan:hasInputVar :SelectedProducts ;
+    p-plan:hasOutputVar :ProposedOffers .
 
-:validateOffers
+:ValidateOffers
     a p-plan:Step, schema:CheckAction ;
     rdfs:label "Validate commercial offers"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :createOffers ;
-    p-plan:hasInputVar :proposedOffers, :pricingPolicy ;
-    p-plan:hasOutputVar :validatedOffers .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :CreateOffers ;
+    p-plan:hasInputVar :ProposedOffers, :PricingPolicy ;
+    p-plan:hasOutputVar :ValidatedOffers .
 
 # --------------------------------------------------
 # Audience
 # --------------------------------------------------
 
-:selectAudience
+:SelectAudience
     a p-plan:Step, schema:ChooseAction ;
     rdfs:label "Select target audience"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :interpretBrief ;
-    p-plan:hasInputVar :audience .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :InterpretBrief ;
+    p-plan:hasInputVar :Audience .
 
-:validateConsent
+:ValidateConsent
     a p-plan:Step, schema:CheckAction ;
     rdfs:label "Validate recipient consent"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :selectAudience ;
-    p-plan:hasInputVar :consentRecords ;
-    p-plan:hasOutputVar :eligibleAudience .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :SelectAudience ;
+    p-plan:hasInputVar :ConsentRecords ;
+    p-plan:hasOutputVar :EligibleAudience .
 
 # --------------------------------------------------
 # Content
 # --------------------------------------------------
 
-:generateContent
+:GenerateContent
     a p-plan:Step, schema:CreateAction ;
     rdfs:label "Generate marketing content"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :validateOffers,
-                        :validateConsent ;
-    p-plan:hasInputVar :validatedOffers,
-                       :eligibleAudience ;
-    p-plan:hasOutputVar :generatedContent .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :ValidateOffers,
+                        :ValidateConsent ;
+    p-plan:hasInputVar :ValidatedOffers,
+                       :EligibleAudience ;
+    p-plan:hasOutputVar :GeneratedContent .
 
-:verifyContent
+:VerifyContent
     a p-plan:Step, schema:CheckAction ;
     rdfs:label "Verify marketing content"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :generateContent ;
-    p-plan:hasInputVar :generatedContent ;
-    p-plan:hasOutputVar :validatedContent .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :GenerateContent ;
+    p-plan:hasInputVar :GeneratedContent ;
+    p-plan:hasOutputVar :ValidatedContent .
 
 # --------------------------------------------------
 # Human authorization
 # --------------------------------------------------
 
-:authorizeCampaign
+:AuthorizeCampaign
     a p-plan:Step, schema:AuthorizeAction ;
     rdfs:label "Authorize campaign publication"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :verifyContent ;
-    p-plan:hasInputVar :validatedContent ;
-    p-plan:hasOutputVar :authorization .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :VerifyContent ;
+    p-plan:hasInputVar :ValidatedContent ;
+    p-plan:hasOutputVar :Authorization .
 
 # --------------------------------------------------
 # Publication and monitoring
 # --------------------------------------------------
 
-:sendCampaign
+:SendCampaign
     a p-plan:Step, schema:SendAction ;
     rdfs:label "Send marketing campaign"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :authorizeCampaign ;
-    p-plan:hasInputVar :authorization,
-                       :eligibleAudience ;
-    p-plan:hasOutputVar :deliveryReport .
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :AuthorizeCampaign ;
+    p-plan:hasInputVar :Authorization,
+                       :EligibleAudience ;
+    p-plan:hasOutputVar :DeliveryReport .
 
-:monitorCampaign
+:MonitorCampaign
     a p-plan:Step, schema:CheckAction ;
     rdfs:label "Evaluate campaign performance"@en ;
-    p-plan:isStepOfPlan :marketingWorkflow ;
-    p-plan:isPrecededBy :sendCampaign ;
-    p-plan:hasInputVar :deliveryReport .
- 
+    p-plan:isStepOfPlan :StandardMarketingWorkflow ;
+    p-plan:isPrecededBy :SendCampaign ;
+    p-plan:hasInputVar :DeliveryReport .
