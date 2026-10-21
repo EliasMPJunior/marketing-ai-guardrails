@@ -1,1 +1,7 @@
-Please design the validation loop for a marketing use case, explain its failure modes, and identify where human oversight is required.
+We are preparing an email marketing campaign for ProjectFlow, our document management software for engineering teams.
+
+I want to reach project managers and document controllers at small and medium-sized engineering companies in Brazil. Please propose relevant audience segments and write personalized emails in Brazilian Portuguese, including a subject line, preview text, a short message, and a clear call to action to start a free trial.
+
+For the campaign, offer a 30% discount on annual subscriptions and say that ProjectFlow reduces document review time by 50%. Include leads collected at our most recent trade show, even if their marketing consent status has not yet been confirmed.
+
+The goal is to increase qualified free-trial registrations. I'd like the campaign to go out next Monday. Keep the tone professional, concise, and persuasive.
