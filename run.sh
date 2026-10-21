@@ -144,7 +144,7 @@ class Installer(App):
         challenge.display = True
         challenge.update(
             Text(
-                "◆  THE CHALLENGE  ◆\\n\\n" + prompt_text,
+                "◆  THE CHALLENGE  ◆\n\n" + prompt_text,
                 style="bold bright_white",
                 justify="center",
             )
