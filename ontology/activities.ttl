@@ -12,7 +12,7 @@
 # Plan
 # --------------------------------------------------
 
-:marketingWorkflow
+:StandardMarketingWorkflow
     a p-plan:Plan ;
     rdfs:label "Marketing campaign workflow"@en .
 
