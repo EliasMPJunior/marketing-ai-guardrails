@@ -123,6 +123,23 @@ The loop is therefore driven by **verified conditions rather than by the identit
 
 Human oversight remains necessary when the conditions themselves require judgment, reliable evidence is unavailable, or publication approval is required.
 
+## Expected Results
+
+The expected outcome is a **small, demonstrable validation workflow** that makes the proposed methodology understandable and testable in the selected marketing use case, without reproducing the entire OntoBDC platform.
+
+The exercise should demonstrate:
+
+1. **An explicit state-driven process:** A Sismic statechart describing the campaign lifecycle, valid transitions, correction paths, rejection, and escalation to human review.
+2. **Capability-independent validation:** Interchangeable capabilities can propose or modify campaign artifacts, but progression depends on the same guards, checks, and state/transition contracts, regardless of which capability produced the result.
+3. **A working validation loop:** A valid campaign can progress, while an invalid or incomplete campaign is stopped and either corrected and revalidated, rejected, or referred for human judgment.
+4. **Observable failure modes:** Representative scenarios, including unsupported advertising claims, excessive discounts, missing consent, or ambiguous instructions, produce explicit outcomes instead of silent acceptance.
+5. **Defined human oversight:** Review and approval points are visible in the workflow, including cases that cannot be resolved through formal rules alone and final authorization before publication.
+6. **Traceable, reproducible decisions:** Each demonstration records the relevant inputs, state transitions, validation outcomes, reasons for rejection or escalation, and human decisions where applicable.
+
+A minimal set of test cases should include **one valid campaign, one policy violation, one unsupported claim, and one case requiring human review**. Their expected outcomes should be stated in advance and checked against actual execution.
+
+**Success does not mean proving that AI-generated marketing content is always correct.** It means showing that probabilistic outputs can be handled by a controlled process in which defined constraints are checked independently, failures are visible, and unresolved decisions are not silently automated.
+
 ## Status
 
 
