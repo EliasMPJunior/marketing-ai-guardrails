@@ -133,13 +133,13 @@ python fsm/main/executor.py --etl-dir trace/<timestamp>
 
 ### Mocks and cost
 
-Capabilities that call Claude Code cost tokens. While these files exist at the repository root, they are used **instead of calling Claude Code**:
+Capabilities that call Claude Code cost tokens. While these files exist in [`mocks/`](mocks), they are used **instead of calling Claude Code**:
 
 | Mock | Replaces |
 |---|---|
-| `tasks.json` | Interpretation of the request. |
-| `step_scores.json` | Scoring. It also holds scores for the subtasks the split mock produces. |
-| `subtasks.json` | The split of ambiguous tasks. |
+| `mocks/tasks.json` | Interpretation of the request. |
+| `mocks/step_scores.json` | Scoring. It also holds scores for the subtasks the split mock produces. |
+| `mocks/subtasks.json` | The split of ambiguous tasks. |
 
 With the mocks the run goes through a split and ends in `published`. To use Claude Code, remove or rename the mocks and make sure `claude` is in the `PATH`. The checks that follow each capability are the same in both modes.
 
@@ -154,7 +154,7 @@ The suite was **written by Claude Code**. It has two parts:
 - `tests/test_scenarios.py` runs the real statechart, guards and capabilities end to end, with the expected outcome of each scenario stated in advance. It covers the valid demand (split, rescored, published), a demand with one strong step per task, an invalid brief, a task without a strong step, a split that does not resolve the ambiguity, scores that name a step missing from the ontology, a tasks listing that breaks its contract, garbage and invented steps coming from Claude Code, a failing and an absent Claude Code, and the consistency of `path.json`.
 - `tests/test_guards.py` tests the objective checks on their own: the inclusive threshold, the "at least one" and "exactly one" guards, unusable or missing scores, and the brief guard.
 
-Each scenario runs in a temporary copy of `fsm/` and `ontology/` with its own mocks and a fake `claude` executable, so the tests never touch the repository mocks and never spend tokens.
+Each scenario runs in a temporary copy of `fsm/`, `ontology/` and `mocks/`, changing the mocks it needs, and a fake `claude` executable, so the tests never touch the files in `mocks/` and never spend tokens.
 
 ## Repository layout
 
@@ -169,8 +169,7 @@ fsm/main/
 fsm/states/<state>/
     guard.py                   Checks that decide whether the state holds
     action.py                  The capability that works toward the state
-tasks.json, step_scores.json,
-subtasks.json                  Mocks (see above)
+mocks/                         Mock outputs of the AI capabilities (see above)
 discussions.md                 Design decisions
 tests/                         Scenario and guard tests (written by Claude Code)
 ```

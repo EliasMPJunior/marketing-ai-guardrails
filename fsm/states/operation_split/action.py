@@ -3,7 +3,7 @@
 The capability asks the local Claude Code to split each task that has more than
 one step scored at or above the threshold into one subtask per strong step, and
 writes the tasks with their subtasks to the run folder. While ``subtasks.json``
-exists at the project root, that file is used as a mock to avoid spending tokens
+exists in the ``mocks`` folder, that file is used as a mock to avoid spending tokens
 during development and tests. Tasks with a single strong step are kept whole.
 Whether the scores allow the split is decided by the guards of the previous
 states, and the split is verified here against the scores before it is written.
@@ -18,7 +18,7 @@ from types import ModuleType
 from typing import Any, Dict, List, Optional, Union
 
 STATES_PATH: Path = Path(__file__).parents[1]
-MOCK_SUBTASKS_PATH: Path = Path(__file__).resolve().parents[3] / "subtasks.json"
+MOCK_SUBTASKS_PATH: Path = Path(__file__).resolve().parents[3] / "mocks" / "subtasks.json"
 TASKS_FILE_NAME: str = "tasks.json"
 SUBTASKS_FILE_NAME: str = "subtasks.json"
 CLAUDE_INSTRUCTION: str = (

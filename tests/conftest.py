@@ -1,7 +1,7 @@
 """Fixtures that run the statechart in an isolated copy of the project.
 
 The capabilities find their mocks relative to their own location, so each
-scenario copies ``fsm/`` and ``ontology/`` into a temporary project root and
+scenario copies ``fsm/``, ``ontology/`` and ``mocks/`` into a temporary project root and
 controls the mocks there. The real repository files are never modified and
 Claude Code is never called: a fake ``claude`` executable stands in for it.
 """
@@ -19,7 +19,6 @@ import pytest
 
 REPO_ROOT: Path = Path(__file__).resolve().parents[1]
 ONTOLOGY_BASE: str = "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#"
-MOCK_NAMES: Tuple[str, ...] = ("tasks.json", "step_scores.json", "subtasks.json")
 FAKE_CLAUDE: str = """#!/usr/bin/env python3
 import os, sys
 mode = os.environ.get("FAKE_CLAUDE_MODE", "fail")
@@ -68,7 +67,7 @@ def step_scores(task_id: Any, *scores: Tuple[str, float]) -> Dict[str, Any]:
 
 def repo_mock(name: str) -> Any:
     """Read one of the repository mocks."""
-    return json.loads((REPO_ROOT / name).read_text(encoding="utf-8"))
+    return json.loads((REPO_ROOT / "mocks" / name).read_text(encoding="utf-8"))
 
 
 @pytest.fixture
@@ -83,13 +82,12 @@ def run_fsm(tmp_path: Path):
         project: Path = tmp_path / "project"
         shutil.copytree(REPO_ROOT / "fsm", project / "fsm", ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copytree(REPO_ROOT / "ontology", project / "ontology")
-        for name in MOCK_NAMES:
-            shutil.copy(REPO_ROOT / name, project / name)
+        shutil.copytree(REPO_ROOT / "mocks", project / "mocks")
         for name, content in (mocks or {}).items():
             if content is None:
-                (project / name).unlink()
+                (project / "mocks" / name).unlink()
             else:
-                (project / name).write_text(json.dumps(content), encoding="utf-8")
+                (project / "mocks" / name).write_text(json.dumps(content), encoding="utf-8")
 
         bin_dir: Path = tmp_path / "bin"
         bin_dir.mkdir()

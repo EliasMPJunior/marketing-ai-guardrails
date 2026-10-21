@@ -5,7 +5,7 @@ step, independently of the capability that produced it: the artifact must exist
 in the run folder and honor the JSON contract requested from Claude Code.
 It then lists every ``p-plan:Step`` of the activities ontology and asks the local
 Claude Code to score how close each of three steps is to each task, writing the
-scores to the run folder; while ``step_scores.json`` exists at the project root,
+scores to the run folder; while ``step_scores.json`` exists in the ``mocks`` folder,
 that file is used as a mock to avoid spending tokens during development and
 tests. Producing the tasks listing remains the job of the ``brief_received``
 capability.
@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional, Union
 from rdflib import Graph
 
 ONTOLOGY_PATH: Path = Path(__file__).resolve().parents[3] / "ontology" / "activities.ttl"
-MOCK_SCORES_PATH: Path = Path(__file__).resolve().parents[3] / "step_scores.json"
+MOCK_SCORES_PATH: Path = Path(__file__).resolve().parents[3] / "mocks" / "step_scores.json"
 TASKS_FILE_NAME: str = "tasks.json"
 SCORES_FILE_NAME: str = "step_scores.json"
 TEXT_KEYS: List[str] = ["task", "objective"]

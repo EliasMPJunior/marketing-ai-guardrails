@@ -2,7 +2,7 @@
 
 The capability produces the tasks listing for the accepted brief and writes it
 to the run folder. It calls the Claude Code executable; while ``tasks.json``
-exists at the project root, that file is used as a mock to avoid spending tokens
+exists in the ``mocks`` folder, that file is used as a mock to avoid spending tokens
 during development and tests. Deciding whether the prompt is valid remains the
 job of the state's guard.
 """
@@ -15,7 +15,7 @@ from typing import Optional, Union
 from rich.console import Console
 from rich.panel import Panel
 
-MOCK_TASKS_PATH: Path = Path(__file__).resolve().parents[3] / "tasks.json"
+MOCK_TASKS_PATH: Path = Path(__file__).resolve().parents[3] / "mocks" / "tasks.json"
 TASKS_FILE_NAME: str = "tasks.json"
 CLAUDE_INSTRUCTION = (
     "Identify the tasks with clear objectives in the text below and deliver them "
