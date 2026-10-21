@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+VENV_DIR="${ROOT_DIR}/.venv"
+REQUIREMENTS="${ROOT_DIR}/requirements.txt"
+
+if [[ ! -f "${REQUIREMENTS}" ]]; then
+  printf '\033[31m[error]\033[0m Missing requirements.txt in %s\n' "${ROOT_DIR}" >&2
+  exit 1
+fi
+
+if ! command -v python3 >/dev/null 2>&1; then
+  printf '\033[31m[error]\033[0m Python 3 is required.\n' >&2
+  exit 1
+fi
+
+printf '\033[36m\n  ◆ Marketing AI Guardrails\033[0m\n'
+printf '\033[2m  Preparing isolated Python environment...\033[0m\n\n'
+
+if [[ ! -x "${VENV_DIR}/bin/python" ]]; then
+  python3 -m venv "${VENV_DIR}"
+fi
+
+PYTHON="${VENV_DIR}/bin/python"
+
+# Textual is installed first so it can display the remaining installation steps.
+"${PYTHON}" -m pip install --disable-pip-version-check --quiet 'textual>=0.80'
+
+"${PYTHON}" -c "$(cat <<'PY'
+import asyncio
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+from textual.app import App, ComposeResult
+from textual.widgets import Footer, Header, LoadingIndicator, RichLog, Static
+
+requirements = Path(sys.argv[1])
+command = [sys.executable, "-m", "pip", "install", "--disable-pip-version-check",
+           "--no-input", "--progress-bar", "off", "-r", str(requirements)]
+console = Console()
+
+
+class Installer(App):
+    TITLE = "Marketing AI Guardrails"
+    SUB_TITLE = "Python environment setup"
+    CSS = """
+    Screen { background: #0d1727; color: #e6f1ff; }
+    #banner { height: 3; content-align: center middle; background: #13344b;
+              color: #53e9d6; text-style: bold; }
+    #message { height: 3; padding: 1 2; color: #d5e4f5; }
+    #spinner { height: 3; color: #53e9d6; }
+    #details { height: 1fr; margin: 1 2; border: round #238eaa;
+               background: #101f31; padding: 0 1; }
+    Footer { background: #13344b; }
+    """
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield Static("◆  MARKETING AI GUARDRAILS  ◆", id="banner")
+        yield Static("[1/2] Installing project dependencies...", id="message")
+        yield LoadingIndicator(id="spinner")
+        yield RichLog(id="details", highlight=False, wrap=True, auto_scroll=True)
+        yield Footer()
+
+    def on_mount(self) -> None:
+        self.run_worker(self.install(), exclusive=True)
+
+    async def install(self) -> None:
+        details = self.query_one("#details", RichLog)
+        message = self.query_one("#message", Static)
+        details.write(Text("→ Resolving packages from requirements.txt", style="bold cyan"))
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
+            )
+            assert process.stdout is not None
+            async for raw_line in process.stdout:
+                line = raw_line.decode("utf-8", errors="replace").rstrip()
+                if line:
+                    details.write(Text(line, style="bright_black"))
+            code = await process.wait()
+        except OSError as error:
+            details.write(Text(str(error), style="bold red"))
+            code = 1
+
+        self.query_one("#spinner", LoadingIndicator).display = False
+        if code == 0:
+            message.update("[2/2] ✓ Environment ready. All dependencies installed.")
+            details.write(Text("✓ Setup complete", style="bold green"))
+        else:
+            message.update("✗ Dependency installation failed. Review the log above.")
+            details.write(Text(f"✗ pip exited with status {code}", style="bold red"))
+        await asyncio.sleep(1.2)
+        self.exit(return_code=code)
+
+
+def run_without_tui() -> int:
+    console.print(Panel.fit(
+        "[bold cyan]Marketing AI Guardrails[/]\n"
+        "[dim]Installing dependencies from requirements.txt[/]",
+        border_style="cyan", title="Setup"))
+    code = subprocess.call(command)
+    return code
+
+
+if sys.stdin.isatty() and sys.stdout.isatty() and os.environ.get("TERM") not in (None, "dumb"):
+    app = Installer()
+    app.run(inline=True)
+    exit_code = app.return_code or 0
+else:
+    exit_code = run_without_tui()
+
+if exit_code == 0:
+    console.print(Panel.fit(
+        "[bold green]✓ Python dependencies installed successfully[/]\n"
+        "[dim]Virtual environment:[/] [cyan].venv[/]\n"
+        "[dim]To activate:[/] [white]source .venv/bin/activate[/]",
+        border_style="green", title="Ready"))
+else:
+    console.print(Panel.fit(
+        f"[bold red]✗ Installation failed (exit code {exit_code}).[/]",
+        border_style="red", title="Error"))
+sys.exit(exit_code)
+PY
+)" "${REQUIREMENTS}"
