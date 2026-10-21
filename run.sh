@@ -71,11 +71,15 @@ class Installer(App):
                background: #101f31; padding: 0 1; }
     #challenge {
         display: none;
-        height: 1fr;
+        height: auto;
+        min-height: 9;
         margin: 1 2;
-        padding: 1 2;
-        content-align: center middle;
+        padding: 2 3;
+        border: round #53e9d6;
         background: #112d3b;
+        color: #ffffff;
+        text-style: bold;
+        content-align: center middle;
     }
     Footer { background: #13344b; }
     """
@@ -135,17 +139,19 @@ class Installer(App):
 
         details.display = False
         challenge = self.query_one("#challenge", Static)
-        challenge.update(Panel(
-            Text(prompt_text, style="bold bright_white", justify="center"),
-            title="[bold bright_cyan]◆  THE CHALLENGE  ◆[/]",
-            subtitle="[dim]prompt.txt[/]",
-            border_style="bright_cyan",
-            padding=(2, 3),
-            expand=True,
-        ))
+        # Use native Textual styling instead of nesting a Rich Panel in a
+        # previously hidden Static widget (which could display as an empty box).
         challenge.display = True
-        message.update("✓ Setup complete. Challenge loaded. Press Enter or Q to close.")
+        challenge.update(
+            Text(
+                "◆  THE CHALLENGE  ◆\\n\\n" + prompt_text,
+                style="bold bright_white",
+                justify="center",
+            )
+        )
+        message.update("✓ Setup complete. Challenge from prompt.txt (Enter or Q to close).")
         self.prompt_ready = True
+        self.refresh(layout=True)
 
 
 def run_without_tui() -> int:
@@ -170,19 +176,20 @@ else:
     exit_code = run_without_tui()
 
 if exit_code == 0:
-    if not interactive:
-        try:
-            prompt_text = load_prompt()
-        except (OSError, ValueError) as error:
-            console.print(f"[bold red]✗ Unable to read prompt.txt: {error}[/]")
-            sys.exit(1)
-        console.print(Panel(
-            Text(prompt_text, style="bold bright_white", justify="center"),
-            border_style="bright_cyan",
-            title="[bold bright_cyan]◆  THE CHALLENGE  ◆[/]",
-            subtitle="prompt.txt",
-            padding=(1, 3),
-        ))
+    # Show the prompt in the terminal after the TUI closes, too. This makes
+    # the actual challenge readable in VS Code's scrollback in all modes.
+    try:
+        prompt_text = load_prompt()
+    except (OSError, ValueError) as error:
+        console.print(f"[bold red]✗ Unable to read prompt.txt: {error}[/]")
+        sys.exit(1)
+    console.print(Panel(
+        Text(prompt_text, style="bold bright_white", justify="center"),
+        border_style="bright_cyan",
+        title="[bold bright_cyan]◆  THE CHALLENGE  ◆[/]",
+        subtitle="prompt.txt",
+        padding=(1, 3),
+    ))
     console.print(Panel.fit(
         "[bold green]✓ Python dependencies installed successfully[/]\n"
         "[dim]Virtual environment:[/] [cyan].venv[/]\n"
