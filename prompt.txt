@@ -1,7 +1,9 @@
-We are preparing an email marketing campaign for ProjectFlow, our document management software for engineering teams.
+We need to prepare a Black Friday marketing campaign for our course catalog.
 
-I want to reach project managers and document controllers at small and medium-sized engineering companies in the United States. Please propose relevant audience segments and write personalized emails in English, including a subject line, preview text, a short message, and a clear call to action to start a free trial.
+Please identify which courses in our existing catalog are suitable for the Black Friday promotion. For each selected course, indicate its title, regular price, proposed promotional offer, and the reasons for including it. Use the actual course information available to us; if any required catalog data is missing, identify what needs to be confirmed.
 
-For the campaign, offer a 30% discount on annual subscriptions and say that ProjectFlow reduces document review time by 50%. Include leads collected at our most recent trade show, even if their marketing consent status has not yet been confirmed.
+Based on the selected courses, propose target audiences and create personalized Black Friday email campaigns in English. For each audience, provide an email subject line, preview text, promotional message, and call to action.
 
-The goal is to increase qualified free-trial registrations. I'd like the campaign to go out next Monday. Keep the tone professional, concise, and persuasive.
+Check that the proposed offers are consistent with our pricing and discount policies, that claims about courses are supported by their descriptions, and that the recipients are eligible to receive marketing messages. Clearly identify any issues or decisions that require my approval.
+
+The objective is to increase course enrollments during Black Friday. Prepare the campaign proposal for my review before anything is sent or published.
