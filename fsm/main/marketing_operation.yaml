@@ -29,19 +29,21 @@ statechart:
         transitions:
           - target: brief_structured
             guard: is_prompt_valid
-            # Transition action: the brief is structured only when the prompt
-            # was valid and the interpretation capability succeeded.
-            action: is_brief_structured = is_prompt_valid and interpret_brief()
           - target: rejected
             guard: not is_prompt_valid
 
       - name: brief_structured
-        contract:
-          - before: is_brief_structured
+        # Entry action: runs the interpretation capability from
+        # states/brief_received/action.py and records the resulting fact.
+        on entry: is_brief_structured = interpret_brief()
         transitions:
           - target: operation_scored
             guard: is_brief_structured
-            action: is_operation_scored = is_brief_structured and score_tasks()
+            action: is_operation_scored = score_tasks()
+          # Nothing was interpreted: the demand is rejected instead of
+          # advancing on an unverified fact.
+          - target: rejected
+            guard: not is_brief_structured
 
       - name: operation_scored
         contract:
@@ -54,33 +56,43 @@ statechart:
         transitions:
           - target: operation_validated
             guard: is_operation_validated
-          # At least one strong step per task, but some tasks have several.
+          # At least one strong step per task, but some tasks have several. The
+          # split capability runs on entry of operation_split, so the machine
+          # routes on its result instead of failing on the state contract.
           - target: operation_split
             guard: is_operation_splittable and not is_operation_validated and split_rounds < max_split_rounds
-            action: |
-              split_rounds += 1
-              is_operation_split = split_tasks()
           # Some task has no strong step, or splitting did not resolve them.
           - target: operation_unresolved
             guard: not is_operation_validated and (not is_operation_splittable or split_rounds >= max_split_rounds)
             action: alert_human_tasks()
 
       - name: operation_split
-        contract:
-          - before: is_operation_split
+        # Entry action: runs the split capability from
+        # states/operation_split/action.py and records the resulting fact.
+        on entry: |
+          split_rounds += 1
+          is_operation_split = split_tasks()
         transitions:
           - target: tasks_replaced
             guard: is_operation_split
-            action: is_tasks_replaced = replace_tasks()
+          # The split could not produce a usable listing: escalate to people.
+          - target: operation_unresolved
+            guard: not is_operation_split
+            action: alert_human_tasks()
 
       - name: tasks_replaced
-        contract:
-          - before: is_tasks_replaced
+        # Entry action: runs the replacement capability from
+        # states/tasks_replaced/action.py and records the resulting fact.
+        on entry: is_tasks_replaced = replace_tasks()
         transitions:
           # Back to scoring: the new tasks need their own step scores.
           - target: operation_scored
             guard: is_tasks_replaced
             action: is_operation_scored = score_tasks()
+          # The nested listing could not be applied: escalate to people.
+          - target: operation_unresolved
+            guard: not is_tasks_replaced
+            action: alert_human_tasks()
 
       - name: operation_validated
         contract:
