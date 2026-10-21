@@ -33,17 +33,24 @@ statechart:
             guard: not is_prompt_valid
 
       - name: brief_structured
-        # Entry action: runs the interpretation capability from
-        # states/brief_received/action.py and records the resulting fact.
-        on entry: is_brief_structured = interpret_brief()
+        # Entry actions: run the interpretation capability from
+        # states/brief_received/action.py and the scoring capability from
+        # states/brief_structured/action.py, recording the resulting facts.
+        on entry: |
+          is_brief_structured = interpret_brief()
+          is_operation_scored = is_brief_structured and score_tasks()
         transitions:
-          - target: operation_scored
-            guard: is_brief_structured
-            action: is_operation_scored = score_tasks()
           # Nothing was interpreted: the demand is rejected instead of
           # advancing on an unverified fact.
           - target: rejected
             guard: not is_brief_structured
+          - target: operation_scored
+            guard: is_operation_scored
+          # The interpretation succeeded but the listing was not scored:
+          # escalate to people instead of entering operation_scored.
+          - target: operation_unresolved
+            guard: is_brief_structured and not is_operation_scored
+            action: alert_human_tasks()
 
       - name: operation_scored
         contract:
@@ -81,17 +88,19 @@ statechart:
             action: alert_human_tasks()
 
       - name: tasks_replaced
-        # Entry action: runs the replacement capability from
-        # states/tasks_replaced/action.py and records the resulting fact.
-        on entry: is_tasks_replaced = replace_tasks()
+        # Entry actions: run the replacement capability from
+        # states/tasks_replaced/action.py and score the new listing again with
+        # the capability from states/brief_structured/action.py.
+        on entry: |
+          is_tasks_replaced = replace_tasks()
+          is_operation_scored = is_tasks_replaced and score_tasks()
         transitions:
-          # Back to scoring: the new tasks need their own step scores.
           - target: operation_scored
-            guard: is_tasks_replaced
-            action: is_operation_scored = score_tasks()
-          # The nested listing could not be applied: escalate to people.
+            guard: is_operation_scored
+          # The nested listing could not be applied, or the new listing could
+          # not be scored: escalate to people.
           - target: operation_unresolved
-            guard: not is_tasks_replaced
+            guard: not is_tasks_replaced or not is_operation_scored
             action: alert_human_tasks()
 
       - name: operation_validated
