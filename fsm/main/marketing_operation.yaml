@@ -48,6 +48,9 @@ statechart:
         transitions:
           - target: operation_validated
             guard: is_operation_validated
+          - target: operation_unresolved
+            guard: not is_operation_validated
+            action: alert_human_tasks()
 
       - name: operation_validated
         contract:
@@ -60,6 +63,9 @@ statechart:
         type: final
         contract:
           - before: is_operation_validated
+
+      - name: operation_unresolved
+        type: final
 
       - name: rejected
         type: final
