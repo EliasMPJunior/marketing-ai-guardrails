@@ -1,0 +1,1 @@
+Please design the validation loop for a marketing use case, explain its failure modes, and identify where human oversight is required.
