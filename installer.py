@@ -1,6 +1,7 @@
 """Provision the isolated environment, present the marketing brief, and hand it to Claude Code."""
 
 import asyncio
+from datetime import datetime
 import os
 import json
 import shutil
@@ -184,8 +185,12 @@ def run_fsm(prompt_text: str) -> int:
         "[bold cyan]Marketing AI Guardrails[/]\n"
         "[dim]Running the marketing operation statechart[/]",
         border_style="cyan", title="FSM"))
-    executor_path: Path = Path(__file__).parent / "fsm" / "main" / "executor.py"
-    return subprocess.call([sys.executable, str(executor_path)])
+    root: Path = Path(__file__).parent
+    etl_dir: Path = root / "etl" / datetime.now().strftime("%Y%m%d-%H%M%S")
+    etl_dir.mkdir(parents=True)
+    (etl_dir / "brief.txt").write_text(prompt_text, encoding="utf-8")
+    executor_path: Path = root / "fsm" / "main" / "executor.py"
+    return subprocess.call([sys.executable, str(executor_path), "--etl-dir", str(etl_dir)])
 
 
 def main() -> int:

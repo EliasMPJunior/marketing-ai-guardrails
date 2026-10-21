@@ -8,7 +8,7 @@ from pathlib import Path
 import unicodedata
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_PROMPT_PATH = PROJECT_ROOT / "prompt.txt"
 MAX_PROMPT_BYTES = 1024 * 1024
 

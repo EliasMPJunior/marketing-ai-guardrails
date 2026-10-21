@@ -11,7 +11,8 @@ from sismic.io import import_from_yaml
 
 STATE_CHART_PATH: Path = Path(__file__).with_name("marketing-operation.yaml")
 BRIEF_GUARD_PATH: Path = Path(__file__).parent / "States" / "Brief Received" / "Guard.py"
-DEFAULT_PROMPT_PATH: Path = Path(__file__).resolve().parents[1] / "prompt.txt"
+BRIEF_FILE_NAME: str = "brief.txt"
+DEFAULT_PROMPT_PATH: Path = Path(__file__).resolve().parents[2] / "prompt.txt"
 
 
 def load_brief_received_guard() -> Callable[[Path], bool]:
@@ -68,6 +69,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_PROMPT_PATH,
         help="marketing prompt file to validate (default: repository prompt.txt)",
     )
+    parser.add_argument(
+        "--etl-dir",
+        type=Path,
+        help="run folder holding brief.txt; takes precedence over --prompt-file",
+    )
     return parser
 
 
@@ -86,7 +92,8 @@ def main() -> None:
     arguments = build_parser().parse_args()
     statechart = import_from_yaml(filepath=STATE_CHART_PATH)
     context = parse_context(arguments.context)
-    context["prompt_is_valid"] = partial(load_brief_received_guard(), arguments.prompt_file)
+    prompt_file: Path = arguments.etl_dir / BRIEF_FILE_NAME if arguments.etl_dir else arguments.prompt_file
+    context["prompt_is_valid"] = partial(load_brief_received_guard(), prompt_file)
     interpreter = Interpreter(statechart, initial_context=context)
     interpreter.execute()
     print(f"initial: {', '.join(interpreter.configuration)}")
