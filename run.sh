@@ -59,7 +59,7 @@ console = Console()
 
 class Installer(App):
     TITLE = "Marketing AI Guardrails"
-    SUB_TITLE = "Setup and challenge"
+    SUB_TITLE = "Setup and marketing brief"
     BINDINGS = [("q", "close_prompt", "Close"), ("enter", "close_prompt", "Continue")]
     prompt_ready = False
     CSS = """
@@ -70,7 +70,7 @@ class Installer(App):
     #spinner { height: 3; color: #53e9d6; }
     #details { height: 1fr; margin: 1 2; border: round #238eaa;
                background: #101f31; padding: 0 1; }
-    #challenge {
+    #user_prompt {
         display: none;
         height: auto;
         min-height: 9;
@@ -91,7 +91,7 @@ class Installer(App):
         yield Static("[1/2] Installing project dependencies...", id="message")
         yield LoadingIndicator(id="spinner")
         yield RichLog(id="details", highlight=False, wrap=True, auto_scroll=True)
-        yield Static("", id="challenge")
+        yield Static("", id="user_prompt")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -139,18 +139,18 @@ class Installer(App):
             return
 
         details.display = False
-        challenge = self.query_one("#challenge", Static)
+        prompt_widget = self.query_one("#user_prompt", Static)
         # Use native Textual styling instead of nesting a Rich Panel in a
         # previously hidden Static widget (which could display as an empty box).
-        challenge.display = True
-        challenge.update(
+        prompt_widget.display = True
+        prompt_widget.update(
             Text(
-                "◆  THE CHALLENGE  ◆\n\n" + prompt_text,
+                "◆  MARKETING USER PROMPT  ◆\n\n" + prompt_text,
                 style="bold bright_white",
                 justify="center",
             )
         )
-        message.update("✓ Setup complete. Challenge from prompt.txt (Enter or Q to close).")
+        message.update("✓ Setup complete. Marketing brief from prompt.txt (Enter or Q to close).")
         self.prompt_ready = True
         self.refresh(layout=True)
 
@@ -199,7 +199,7 @@ else:
 
 if exit_code == 0:
     # Show the prompt in the terminal after the TUI closes, too. This makes
-    # the actual challenge readable in VS Code's scrollback in all modes.
+    # the marketing brief readable in VS Code's scrollback in all modes.
     try:
         prompt_text = load_prompt()
     except (OSError, ValueError) as error:
@@ -208,7 +208,7 @@ if exit_code == 0:
     console.print(Panel(
         Text(prompt_text, style="bold bright_white", justify="center"),
         border_style="bright_cyan",
-        title="[bold bright_cyan]◆  THE CHALLENGE  ◆[/]",
+        title="[bold bright_cyan]◆  MARKETING USER PROMPT  ◆[/]",
         subtitle="prompt.txt",
         padding=(1, 3),
     ))
