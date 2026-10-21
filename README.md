@@ -1,6 +1,6 @@
 # Marketing AI Guardrails
 
-A small, runnable exercise in designing a **validation loop** for an AI-assisted marketing workflow: what is checked and by whom, what can go wrong, and where people must step in.
+A small, runnable exercise in designing a **validation loop** for an AI-assisted marketing workflow: what is checked and by whom, what can go wrong, and where people must step in. LLM steps have been done by Claude Code.
 
 ## The challenge
 
