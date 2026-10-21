@@ -103,11 +103,19 @@ A confident score is not trusted as truth: it only chooses between paths, and on
 
 People are required wherever the conditions themselves need judgment:
 
-- **Today:** `operation_unresolved` is the hand-off. The alert states which tasks could not be resolved and why, and that the demand can be integrated into the human tasks workflow. The system stops there instead of guessing.
-
-  ![Alert shown by operation_unresolved](docs/operation_unresolved_alert.png)
+- **Today:** `operation_unresolved` is the hand-off. The alert states which tasks could not be resolved and why, and that the demand can be integrated into the human tasks workflow (see [Screenshots](#screenshots)).
 - **Not automated, by design:** the threshold (`MIN_SCORE`), the number of split rounds and the ontology are rules that people own and review; the statechart enforces them but does not decide them.
 - **Planned:** approval of offers and claims, adjudication of eligibility doubts and the final authorization before publication (see [Future steps](#future-steps)).
+
+## Screenshots
+
+![Screenshot](docs/screenshot.png)
+
+*TODO: caption.*
+
+![Alert shown by operation_unresolved](docs/operation_unresolved_alert.png)
+
+*The alert `operation_unresolved` shows: which tasks could not be resolved and why, and that the demand can be handed to the human tasks workflow.*
 
 ## Traceability
 
