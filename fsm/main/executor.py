@@ -70,6 +70,7 @@ def main() -> None:
             load_state_callable("operation_scored", "guard", "every_task_has_strong_step"), prompt_file,
         ),
         "split_tasks": partial(load_state_callable("operation_split", "action", "action"), prompt_file),
+        "replace_tasks": partial(load_state_callable("tasks_replaced", "action", "action"), prompt_file),
         "alert_human_tasks": partial(load_state_callable("operation_unresolved", "action", "action"), prompt_file),
     }
     interpreter = Interpreter(statechart, initial_context=context)

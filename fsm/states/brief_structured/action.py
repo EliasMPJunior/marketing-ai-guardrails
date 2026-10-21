@@ -82,9 +82,12 @@ def ask_scores(tasks: List[Dict[str, Any]], steps: Dict[str, str]) -> Optional[A
     """Ask the local Claude Code to score the proximity between tasks and steps."""
     if MOCK_SCORES_PATH.is_file():
         try:
-            return json.loads(MOCK_SCORES_PATH.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
+            mock: Any = json.loads(MOCK_SCORES_PATH.read_text(encoding="utf-8"))
+            by_id: Dict[Any, Any] = {entry["id"]: entry for entry in mock}
+        except (OSError, ValueError, KeyError, TypeError):
             return None
+        # The mock holds scores for every task id used in the demos; keep the current ones.
+        return [by_id[task["id"]] for task in tasks if task["id"] in by_id]
     claude: Optional[str] = shutil.which("claude")
     if claude is None:
         return None

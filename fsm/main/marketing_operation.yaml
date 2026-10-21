@@ -13,6 +13,10 @@ statechart:
     is_offer_compliant = setdefault("is_offer_compliant", False)
     are_claims_grounded = setdefault("are_claims_grounded", False)
     review_decision = setdefault("review_decision", None)
+    # Bound on how many times a task listing may be split and rescored, so the
+    # loop through operation_split cannot run (and spend tokens) forever.
+    max_split_rounds = setdefault("max_split_rounds", 1)
+    split_rounds = setdefault("split_rounds", 0)
 
   root state:
     name: root
@@ -52,17 +56,31 @@ statechart:
             guard: is_operation_validated
           # At least one strong step per task, but some tasks have several.
           - target: operation_split
-            guard: is_operation_splittable and not is_operation_validated
-            action: is_operation_split = split_tasks()
-          # Some task has no strong step at all.
+            guard: is_operation_splittable and not is_operation_validated and split_rounds < max_split_rounds
+            action: |
+              split_rounds += 1
+              is_operation_split = split_tasks()
+          # Some task has no strong step, or splitting did not resolve them.
           - target: operation_unresolved
-            guard: not is_operation_splittable
+            guard: not is_operation_validated and (not is_operation_splittable or split_rounds >= max_split_rounds)
             action: alert_human_tasks()
 
       - name: operation_split
-        type: final
         contract:
           - before: is_operation_split
+        transitions:
+          - target: tasks_replaced
+            guard: is_operation_split
+            action: is_tasks_replaced = replace_tasks()
+
+      - name: tasks_replaced
+        contract:
+          - before: is_tasks_replaced
+        transitions:
+          # Back to scoring: the new tasks need their own step scores.
+          - target: operation_scored
+            guard: is_tasks_replaced
+            action: is_operation_scored = score_tasks()
 
       - name: operation_validated
         contract:
