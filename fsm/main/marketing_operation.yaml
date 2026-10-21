@@ -37,7 +37,7 @@ statechart:
         transitions:
           - target: operation_scored
             guard: is_brief_structured
-            action: is_operation_scored = is_brief_structured and validate_tasks()
+            action: is_operation_scored = is_brief_structured and score_tasks()
 
       - name: operation_scored
         contract:

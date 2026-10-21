@@ -62,7 +62,7 @@ def main() -> None:
     context: Dict[str, Any] = {
         "check_prompt": partial(load_state_callable("brief_received", "guard", "guard"), prompt_file),
         "interpret_brief": partial(load_state_callable("brief_received", "action", "action"), prompt_file),
-        "validate_tasks": partial(load_state_callable("brief_structured", "action", "action"), prompt_file),
+        "score_tasks": partial(load_state_callable("brief_structured", "action", "action"), prompt_file),
     }
     interpreter = Interpreter(statechart, initial_context=context)
     interpreter.execute()
