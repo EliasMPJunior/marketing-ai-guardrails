@@ -46,6 +46,83 @@ The design will examine a layered workflow:
 
 Semantic representations, rules, and deterministic validation may be used where appropriate. Passing a structural or logical check, however, does **not** by itself establish factual truth, legal compliance, or marketing effectiveness.
 
+## Methodology
+
+This exercise presents a **simplified version of my own methodology, developed and published in [OntoBDC](https://github.com/EliasMPJunior/ontobdc-wip)**.
+
+The simplification is intentional: it is meant for **presentation and easier understanding of the methodology's underlying principles**, rather than reproducing the full OntoBDC runtime or all of its features.
+
+The approach is organized around a few key elements: **finite state machines**, **independent capabilities**, **state and transition constraints**, and an **explicit validation loop**. The goal is not to turn a probabilistic AI model into a deterministic model, but to place its outputs inside an observable workflow whose progress is governed by verifiable conditions.
+
+## Concepts
+
+### Finite State Machine (FSM)
+
+A **Finite State Machine** represents a process as a defined set of states and transitions. A transition is allowed only when its corresponding conditions are met.
+
+In this exercise, states represent **verifiable stages of the marketing workflow**, such as an interpreted brief, a validated audience, an approved offer, or content ready for human review. They are not merely labels for functions that have run.
+
+A possible sequence is:
+
+```text
+Brief received → Brief structured → Campaign validated → Content generated
+                       ↑                   |                      |
+                       └──── correction ───┘                      |
+                                                                  ↓
+                                      Human review ← Content validated
+                                            |              |
+                                            └── approval → Publication
+```
+
+If a required condition is not satisfied, the process must not advance as if the state had been achieved. The machine can follow an explicitly defined correction, rejection, or escalation path.
+
+#### Sismic
+
+The implementation will use [Sismic](https://sismic.readthedocs.io/), a Python library for defining and executing **statecharts**, which extend finite state machines with features such as hierarchical states, events, guarded transitions, and executable contracts.
+
+Sismic coordinates **which state is active**, **which transitions are possible**, and **which conditions must hold**. The statechart expresses the workflow; it does not need to embed the implementation of every operation.
+
+### Capabilities
+
+A **capability** is a bounded, independently executable unit of work. It might interpret a marketing brief, resolve customer eligibility, check consent, verify a product claim, or generate campaign copy.
+
+Capabilities are **not states**:
+
+- A **state** describes a condition the system can verify.
+- A **capability** performs work intended to establish or modify that condition.
+- A **transition** describes when the machine may move from one state to another.
+
+A state can be reached through different capabilities or implementation strategies, provided the **same required conditions** are satisfied. Similarly, a capability returning without an error does not prove that the expected state has been reached.
+
+This separation allows the implementation of a capability to change without redefining the workflow's acceptance criteria.
+
+### Guards, Contracts, and Constraints
+
+Sismic provides complementary ways to control execution:
+
+- **Guards** are boolean conditions associated with transitions. They determine whether a transition is eligible to occur.
+- **`before` contracts** express preconditions that must hold before entering a state or executing a transition.
+- **`after` contracts** express postconditions verified after leaving a state or completing a transition.
+- **`always` contracts** express invariants that must remain true while the applicable state or transition is active.
+
+These contracts are particularly important to the methodology: **validation belongs to the state or transition contract, not exclusively to the capability that performed the work**.
+
+For example, a capability may generate a promotional offer, but the relevant postcondition still requires the resulting offer to comply with the approved discount policy. A different capability might attempt the same task; the acceptance criterion remains unchanged.
+
+Domain-specific checks, such as semantic constraints, consent rules, evidence requirements, or commercial limits, can be exposed to the state machine through dedicated validation operations. Sismic enforces the contracts expressed in the statechart; it does not automatically establish the truth of external business data.
+
+### How the Validation Loop Works
+
+1. The state machine identifies the current state and an intended next state.
+2. A capability performs the operation needed to establish the intended conditions.
+3. Independent checks evaluate the resulting data or artifacts.
+4. Guards and contracts determine whether the required state or transition conditions are satisfied.
+5. The configured workflow either **advances**, **attempts correction and revalidation**, **rejects the operation**, or **escalates it for human review**.
+
+The loop is therefore driven by **verified conditions rather than by the identity, confidence, or success message of the capability**. Retries and escalation are explicit paths in the statechart, not automatic behavior supplied by Sismic.
+
+Human oversight remains necessary when the conditions themselves require judgment, reliable evidence is unavailable, or publication approval is required.
+
 ## Status
 
 This repository is the starting point for the exercise. Design decisions, examples, implementation, test cases, and observed limitations will be documented as the work progresses.
