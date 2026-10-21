@@ -1,13 +1,27 @@
 """Execute the marketing operation statechart through Sismic."""
 
 import argparse
+import importlib.util
+from functools import partial
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from sismic.interpreter import Interpreter
 from sismic.io import import_from_yaml
 
 STATE_CHART_PATH: Path = Path(__file__).with_name("marketing-operation.yaml")
+BRIEF_GUARD_PATH: Path = Path(__file__).parent / "States" / "Brief Received" / "Guard.py"
+DEFAULT_PROMPT_PATH: Path = Path(__file__).resolve().parents[1] / "prompt.txt"
+
+
+def load_brief_received_guard() -> Callable[[Path], bool]:
+    """Load the guard defined for the brief_received state."""
+    spec = importlib.util.spec_from_file_location("brief_received_guard", BRIEF_GUARD_PATH)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load brief received guard: {BRIEF_GUARD_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.guard
 
 
 def parse_context_value(raw_value: str) -> Any:
@@ -48,6 +62,12 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="NAME=VALUE",
         help="verified fact injected into the statechart context (repeatable)",
     )
+    parser.add_argument(
+        "--prompt-file",
+        type=Path,
+        default=DEFAULT_PROMPT_PATH,
+        help="marketing prompt file to validate (default: repository prompt.txt)",
+    )
     return parser
 
 
@@ -65,7 +85,9 @@ def dispatch(interpreter: Interpreter, event_name: str) -> str:
 def main() -> None:
     arguments = build_parser().parse_args()
     statechart = import_from_yaml(filepath=STATE_CHART_PATH)
-    interpreter = Interpreter(statechart, initial_context=parse_context(arguments.context))
+    context = parse_context(arguments.context)
+    context["prompt_is_valid"] = partial(load_brief_received_guard(), arguments.prompt_file)
+    interpreter = Interpreter(statechart, initial_context=context)
     interpreter.execute()
     print(f"initial: {', '.join(interpreter.configuration)}")
     for event_name in arguments.events:
