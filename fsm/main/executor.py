@@ -60,7 +60,7 @@ def main() -> None:
     statechart = import_from_yaml(filepath=STATE_CHART_PATH)
     prompt_file: Path = arguments.etl_dir / BRIEF_FILE_NAME
     context: Dict[str, Any] = {
-        "prompt_is_valid": partial(load_state_callable("guard", "guard"), prompt_file),
+        "check_prompt": partial(load_state_callable("guard", "guard"), prompt_file),
         "interpret_brief": partial(load_state_callable("action", "action"), prompt_file),
     }
     interpreter = Interpreter(statechart, initial_context=context)

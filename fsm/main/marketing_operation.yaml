@@ -8,10 +8,10 @@ statechart:
   preamble: |
     # Verified facts produced by capabilities and independent checks. The
     # statechart only verifies them; it never establishes them itself.
-    brief_structured = setdefault("brief_structured", False)
-    audience_verified = setdefault("audience_verified", False)
-    offer_compliant = setdefault("offer_compliant", False)
-    claims_grounded = setdefault("claims_grounded", False)
+    is_brief_structured = setdefault("is_brief_structured", False)
+    is_audience_verified = setdefault("is_audience_verified", False)
+    is_offer_compliant = setdefault("is_offer_compliant", False)
+    are_claims_grounded = setdefault("are_claims_grounded", False)
     review_decision = setdefault("review_decision", None)
 
   root state:
@@ -21,26 +21,27 @@ statechart:
       - name: brief_received
         # Entry action: runs the objective input checks from
         # states/brief_received/guard.py and records the resulting fact.
-        on entry: brief_is_valid = prompt_is_valid()
+        on entry: is_prompt_valid = check_prompt()
+        # Exit action: the brief is structured only when the prompt was valid
+        # and the interpretation capability succeeded.
+        on exit: is_brief_structured = is_prompt_valid and interpret_brief()
         transitions:
           - target: brief_structured
-            guard: brief_is_valid
-            action: interpret_brief()
+            guard: is_prompt_valid
           - target: rejected
-            # event: reject
-            guard: not brief_is_valid
+            guard: not is_prompt_valid
 
       - name: brief_structured
         transitions:
           - target: campaign_validated
             event: validate_campaign
-            guard: brief_structured and audience_verified and offer_compliant
+            guard: is_brief_structured
 
       - name: campaign_validated
         transitions:
           - target: content_generated
             event: generate_content
-            guard: audience_verified and offer_compliant
+            guard: is_audience_verified and is_offer_compliant
           # Correction path: the validation loop sends the case back to the
           # structured brief instead of advancing as if it had passed.
           - target: brief_structured
@@ -50,7 +51,7 @@ statechart:
         transitions:
           - target: content_validated
             event: validate_content
-            guard: claims_grounded
+            guard: are_claims_grounded
           - target: human_review
             event: escalate
 
@@ -75,7 +76,7 @@ statechart:
       - name: published
         type: final
         contract:
-          - before: audience_verified and offer_compliant and claims_grounded
+          - before: is_audience_verified and is_offer_compliant and are_claims_grounded
 
       - name: rejected
         type: final
