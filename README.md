@@ -30,7 +30,7 @@ The AI is not turned into a deterministic component. Its outputs are placed insi
 
 ## Approach
 
-This is a simplified version of the methodology I developed and published in [OntoBDC](https://github.com/EliasMPJunior/ontobdc-wip). The simplification is intentional: it keeps the principles easy to follow without reproducing the full runtime.
+This is a simplified version of the methodology I developed and published in [OntoBDC](https://github.com/OntoBDC). The simplification is intentional: it keeps the principles easy to follow without reproducing the full runtime.
 
 - **States are verifiable conditions**, not labels for functions that ran. `operation_scored` means that a valid scores file exists for the current tasks.
 - **Capabilities are bounded units of work** that try to establish a condition (interpret a brief, score tasks, split a task). They are interchangeable: a capability returning normally proves nothing.
