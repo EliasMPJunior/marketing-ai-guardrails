@@ -27,8 +27,8 @@ statechart:
             guard: brief_is_valid
             action: interpret_brief()
           - target: rejected
-            event: reject
-            guard: not brief_structured
+            # event: reject
+            guard: not brief_is_valid
 
       - name: brief_structured
         transitions:
