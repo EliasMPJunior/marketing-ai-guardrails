@@ -109,13 +109,23 @@ People are required wherever the conditions themselves need judgment:
 
 ## Screenshots
 
-![Screenshot](docs/screenshot.png)
+### Start of a run (`./run.sh`)
 
-*TODO: caption.*
+![Terminal output of ./run.sh: the marketing prompt, the dependency setup and the start of the statechart](docs/run_startup.png)
 
-![Alert shown by operation_unresolved](docs/operation_unresolved_alert.png)
+The terminal right after `./run.sh` starts. The script prepares the isolated Python environment, and the interface then shows, from top to bottom:
 
-*The alert `operation_unresolved` shows: which tasks could not be resolved and why, and that the demand can be handed to the human tasks workflow.*
+- the **marketing user prompt** read from [`prompt.txt`](prompt.txt): the Black Friday request that is the input of the whole exercise, and the text saved as `brief.txt` in the trace folder;
+- the **Ready** panel, confirming that the dependencies were installed in `.venv`;
+- the **FSM** panel, marking the moment the marketing operation statechart starts running on that prompt.
+
+From here the statechart takes over, and everything that follows is recorded in the trace folder (see [Traceability](#traceability)).
+
+### Escalation to people (`operation_unresolved`)
+
+![Alert shown when a demand cannot be resolved automatically](docs/operation_unresolved_alert.png)
+
+The alert shown by the `operation_unresolved` state when the scores do not single out one step for every task. It lists the tasks that could not be resolved and why, and says that the demand can be integrated into the human tasks workflow. This is the point where the system stops instead of guessing (see [Human oversight](#human-oversight)).
 
 ## Traceability
 
