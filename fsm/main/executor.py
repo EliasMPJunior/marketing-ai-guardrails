@@ -10,16 +10,16 @@ from sismic.interpreter import Interpreter
 from sismic.io import import_from_yaml
 
 STATE_CHART_PATH: Path = Path(__file__).with_name("marketing_operation.yaml")
-BRIEF_STATE_PATH: Path = Path(__file__).parents[1] / "states" / "brief_received"
+STATES_PATH: Path = Path(__file__).parents[1] / "states"
 BRIEF_FILE_NAME: str = "brief.txt"
 
 
-def load_state_callable(module_name: str, attribute: str) -> Callable[[Path], Any]:
-    """Load one callable (guard or capability) defined by a brief_received module."""
-    module_path: Path = BRIEF_STATE_PATH / f"{module_name}.py"
-    spec = importlib.util.spec_from_file_location(f"brief_received_{module_name}", module_path)
+def load_state_callable(state_name: str, module_name: str, attribute: str) -> Callable[[Path], Any]:
+    """Load one callable (guard or capability) defined by a state module."""
+    module_path: Path = STATES_PATH / state_name / f"{module_name}.py"
+    spec = importlib.util.spec_from_file_location(f"{state_name}_{module_name}", module_path)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Cannot load brief received module: {module_path}")
+        raise ImportError(f"Cannot load state module: {module_path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return getattr(module, attribute)
@@ -60,8 +60,9 @@ def main() -> None:
     statechart = import_from_yaml(filepath=STATE_CHART_PATH)
     prompt_file: Path = arguments.etl_dir / BRIEF_FILE_NAME
     context: Dict[str, Any] = {
-        "check_prompt": partial(load_state_callable("guard", "guard"), prompt_file),
-        "interpret_brief": partial(load_state_callable("action", "action"), prompt_file),
+        "check_prompt": partial(load_state_callable("brief_received", "guard", "guard"), prompt_file),
+        "interpret_brief": partial(load_state_callable("brief_received", "action", "action"), prompt_file),
+        "validate_tasks": partial(load_state_callable("brief_structured", "action", "action"), prompt_file),
     }
     interpreter = Interpreter(statechart, initial_context=context)
     interpreter.execute()

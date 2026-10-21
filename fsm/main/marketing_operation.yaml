@@ -22,61 +22,34 @@ statechart:
         # Entry action: runs the objective input checks from
         # states/brief_received/guard.py and records the resulting fact.
         on entry: is_prompt_valid = check_prompt()
-        # Exit action: the brief is structured only when the prompt was valid
-        # and the interpretation capability succeeded.
-        on exit: is_brief_structured = is_prompt_valid and interpret_brief()
         transitions:
           - target: brief_structured
             guard: is_prompt_valid
+            # Transition action: the brief is structured only when the prompt
+            # was valid and the interpretation capability succeeded.
+            action: is_brief_structured = is_prompt_valid and interpret_brief()
           - target: rejected
             guard: not is_prompt_valid
 
       - name: brief_structured
-        transitions:
-          - target: campaign_validated
-            event: validate_campaign
-            guard: is_brief_structured
-
-      - name: campaign_validated
-        transitions:
-          - target: content_generated
-            event: generate_content
-            guard: is_audience_verified and is_offer_compliant
-          # Correction path: the validation loop sends the case back to the
-          # structured brief instead of advancing as if it had passed.
-          - target: brief_structured
-            event: revise_brief
-
-      - name: content_generated
-        transitions:
-          - target: content_validated
-            event: validate_content
-            guard: are_claims_grounded
-          - target: human_review
-            event: escalate
-
-      - name: content_validated
-        transitions:
-          - target: human_review
-            event: request_human_review
-
-      - name: human_review
         contract:
-          - always: review_decision in (None, "approve", "reject")
+          - before: is_brief_structured
+        transitions:
+          - target: operation_validated
+            guard: is_brief_structured
+            action: is_operation_validated = is_brief_structured and validate_tasks()
+
+      - name: operation_validated
+        contract:
+          - before: is_operation_validated
         transitions:
           - target: published
-            event: approve
-            guard: review_decision == "approve"
-          - target: rejected
-            event: reject
-            guard: review_decision == "reject"
-          - target: content_generated
-            event: revise_content
+            guard: is_operation_validated
 
       - name: published
         type: final
         contract:
-          - before: is_audience_verified and is_offer_compliant and are_claims_grounded
+          - before: is_operation_validated
 
       - name: rejected
         type: final
