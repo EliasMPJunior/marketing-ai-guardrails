@@ -27,9 +27,10 @@ PYTHON="${VENV_DIR}/bin/python"
 # Textual is installed first so it can display the remaining installation steps.
 "${PYTHON}" -m pip install --disable-pip-version-check --quiet 'textual>=0.80'
 
-"${PYTHON}" -c "$(cat <<'PY'
+"${PYTHON}" - "${REQUIREMENTS}" "${ROOT_DIR}/prompt.txt" <<'PY'
 import asyncio
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -163,6 +164,27 @@ def run_without_tui() -> int:
     return code
 
 
+CLAUDE_INSTRUCTION = (
+    "Identify the tasks with clear objectives in the text below and deliver them "
+    "as a JSON listing. Answer with JSON only: an array of objects with the keys "
+    '"id", "task" and "objective". No prose and no code fences.'
+)
+
+
+def ask_claude(prompt_text: str) -> int:
+    claude = shutil.which("claude")
+    if claude is None:
+        console.print(Panel.fit(
+            "[bold red]✗ Claude Code executable not found in PATH.[/]",
+            border_style="red", title="Error"))
+        return 1
+    console.print(Panel.fit(
+        "[bold cyan]Marketing AI Guardrails[/]\n"
+        "[dim]Asking Claude Code for the tasks with clear objectives[/]",
+        border_style="cyan", title="Claude Code"))
+    return subprocess.call([claude, "-p", f"{CLAUDE_INSTRUCTION}\n\n{prompt_text}"])
+
+
 interactive = (
     sys.stdin.isatty()
     and sys.stdout.isatty()
@@ -195,10 +217,10 @@ if exit_code == 0:
         "[dim]Virtual environment:[/] [cyan].venv[/]\n"
         "[dim]To activate:[/] [white]source .venv/bin/activate[/]",
         border_style="green", title="Ready"))
+    exit_code = ask_claude(prompt_text)
 else:
     console.print(Panel.fit(
         f"[bold red]✗ Installation failed (exit code {exit_code}).[/]",
         border_style="red", title="Error"))
 sys.exit(exit_code)
 PY
-)" "${REQUIREMENTS}" "${ROOT_DIR}/prompt.txt"
