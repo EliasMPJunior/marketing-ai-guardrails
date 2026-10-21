@@ -1,1 +1,169 @@
-# Activities ontology — definitions to be added.
+# Activities ontology
+
+
+@prefix : <https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#> .
+
+@prefix p-plan: <http://purl.org/net/p-plan#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# --------------------------------------------------
+# Plan
+# --------------------------------------------------
+
+:marketingWorkflow
+    a p-plan:Plan ;
+    rdfs:label "Marketing campaign workflow"@en .
+
+# --------------------------------------------------
+# Input and output variables
+# --------------------------------------------------
+
+:brief a p-plan:Variable .
+:catalog a p-plan:Variable .
+:candidates a p-plan:Variable .
+:eligibleProducts a p-plan:Variable .
+:selectedProducts a p-plan:Variable .
+:pricingPolicy a p-plan:Variable .
+:proposedOffers a p-plan:Variable .
+:validatedOffers a p-plan:Variable .
+:audience a p-plan:Variable .
+:consentRecords a p-plan:Variable .
+:eligibleAudience a p-plan:Variable .
+:generatedContent a p-plan:Variable .
+:validatedContent a p-plan:Variable .
+:authorization a p-plan:Variable .
+:deliveryReport a p-plan:Variable .
+
+# --------------------------------------------------
+# Planning
+# --------------------------------------------------
+
+:interpretBrief
+    a p-plan:Step, schema:Action ;
+    rdfs:label "Interpret marketing brief"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:hasInputVar :brief .
+
+# --------------------------------------------------
+# Product discovery and selection
+# --------------------------------------------------
+
+:discoverProducts
+    a p-plan:Step, schema:SearchAction ;
+    rdfs:label "Discover available products"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :interpretBrief ;
+    p-plan:hasInputVar :catalog ;
+    p-plan:hasOutputVar :candidates .
+
+:evaluateProducts
+    a p-plan:Step, schema:CheckAction ;
+    rdfs:label "Evaluate product eligibility"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :discoverProducts ;
+    p-plan:hasInputVar :candidates ;
+    p-plan:hasOutputVar :eligibleProducts .
+
+:selectProducts
+    a p-plan:Step, schema:ChooseAction ;
+    rdfs:label "Select products for promotion"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :evaluateProducts ;
+    p-plan:hasInputVar :eligibleProducts ;
+    p-plan:hasOutputVar :selectedProducts .
+
+# --------------------------------------------------
+# Commercial offers
+# --------------------------------------------------
+
+:createOffers
+    a p-plan:Step, schema:CreateAction ;
+    rdfs:label "Create promotional offers"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :selectProducts ;
+    p-plan:hasInputVar :selectedProducts ;
+    p-plan:hasOutputVar :proposedOffers .
+
+:validateOffers
+    a p-plan:Step, schema:CheckAction ;
+    rdfs:label "Validate commercial offers"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :createOffers ;
+    p-plan:hasInputVar :proposedOffers, :pricingPolicy ;
+    p-plan:hasOutputVar :validatedOffers .
+
+# --------------------------------------------------
+# Audience
+# --------------------------------------------------
+
+:selectAudience
+    a p-plan:Step, schema:ChooseAction ;
+    rdfs:label "Select target audience"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :interpretBrief ;
+    p-plan:hasInputVar :audience .
+
+:validateConsent
+    a p-plan:Step, schema:CheckAction ;
+    rdfs:label "Validate recipient consent"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :selectAudience ;
+    p-plan:hasInputVar :consentRecords ;
+    p-plan:hasOutputVar :eligibleAudience .
+
+# --------------------------------------------------
+# Content
+# --------------------------------------------------
+
+:generateContent
+    a p-plan:Step, schema:CreateAction ;
+    rdfs:label "Generate marketing content"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :validateOffers,
+                        :validateConsent ;
+    p-plan:hasInputVar :validatedOffers,
+                       :eligibleAudience ;
+    p-plan:hasOutputVar :generatedContent .
+
+:verifyContent
+    a p-plan:Step, schema:CheckAction ;
+    rdfs:label "Verify marketing content"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :generateContent ;
+    p-plan:hasInputVar :generatedContent ;
+    p-plan:hasOutputVar :validatedContent .
+
+# --------------------------------------------------
+# Human authorization
+# --------------------------------------------------
+
+:authorizeCampaign
+    a p-plan:Step, schema:AuthorizeAction ;
+    rdfs:label "Authorize campaign publication"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :verifyContent ;
+    p-plan:hasInputVar :validatedContent ;
+    p-plan:hasOutputVar :authorization .
+
+# --------------------------------------------------
+# Publication and monitoring
+# --------------------------------------------------
+
+:sendCampaign
+    a p-plan:Step, schema:SendAction ;
+    rdfs:label "Send marketing campaign"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :authorizeCampaign ;
+    p-plan:hasInputVar :authorization,
+                       :eligibleAudience ;
+    p-plan:hasOutputVar :deliveryReport .
+
+:monitorCampaign
+    a p-plan:Step, schema:CheckAction ;
+    rdfs:label "Evaluate campaign performance"@en ;
+    p-plan:isStepOfPlan :marketingWorkflow ;
+    p-plan:isPrecededBy :sendCampaign ;
+    p-plan:hasInputVar :deliveryReport .
+ 
