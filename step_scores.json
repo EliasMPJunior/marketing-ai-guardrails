@@ -1,0 +1,70 @@
+[
+  {
+    "id": 1,
+    "steps": [
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#SelectProducts",
+        "score": 1.0
+      },
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#DiscoverProducts",
+        "score": 0.7
+      },
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#CreateOffers",
+        "score": 0.6
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "steps": [
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#SelectAudience",
+        "score": 1.0
+      },
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#GenerateContent",
+        "score": 0.9
+      },
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#InterpretBrief",
+        "score": 0.4
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "steps": [
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#ValidateOffers",
+        "score": 1.0
+      },
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#VerifyContent",
+        "score": 0.9
+      },
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#ValidateConsent",
+        "score": 0.9
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "steps": [
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#AuthorizeCampaign",
+        "score": 0.85
+      },
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#SendCampaign",
+        "score": 0.5
+      },
+      {
+        "uri": "https://github.com/EliasMPJunior/marketing-ai-guardrails/ontology/activities.ttl#GenerateContent",
+        "score": 0.4
+      }
+    ]
+  }
+]

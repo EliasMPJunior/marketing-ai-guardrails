@@ -5,8 +5,10 @@ step, independently of the capability that produced it: the artifact must exist
 in the run folder and honor the JSON contract requested from Claude Code.
 It then lists every ``p-plan:Step`` of the activities ontology and asks the local
 Claude Code to score how close each of three steps is to each task, writing the
-scores to the run folder. Producing the tasks listing remains the job of the
-``brief_received`` capability.
+scores to the run folder; while ``step_scores.json`` exists at the project root,
+that file is used as a mock to avoid spending tokens during development and
+tests. Producing the tasks listing remains the job of the ``brief_received``
+capability.
 """
 
 import json
@@ -18,6 +20,7 @@ from typing import Any, Dict, List, Optional, Union
 from rdflib import Graph
 
 ONTOLOGY_PATH: Path = Path(__file__).resolve().parents[3] / "ontology" / "activities.ttl"
+MOCK_SCORES_PATH: Path = Path(__file__).resolve().parents[3] / "step_scores.json"
 TASKS_FILE_NAME: str = "tasks.json"
 SCORES_FILE_NAME: str = "step_scores.json"
 TEXT_KEYS: List[str] = ["task", "objective"]
@@ -77,6 +80,11 @@ def list_steps() -> Dict[str, str]:
 
 def ask_scores(tasks: List[Dict[str, Any]], steps: Dict[str, str]) -> Optional[Any]:
     """Ask the local Claude Code to score the proximity between tasks and steps."""
+    if MOCK_SCORES_PATH.is_file():
+        try:
+            return json.loads(MOCK_SCORES_PATH.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
     claude: Optional[str] = shutil.which("claude")
     if claude is None:
         return None
