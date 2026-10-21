@@ -1,3 +1,6 @@
+# Textual user interface for the setup script
+textual>=0.80
+
 # Finite-state machine / statechart interpreter
 sismic
 
