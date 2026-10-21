@@ -22,7 +22,9 @@ statechart:
         transitions:
           - target: brief_structured
             event: structure_brief
-            guard: brief_structured
+            # Validate the source prompt with States/Brief Received/Guard.py
+            # before allowing the already verified structured brief to advance.
+            guard: prompt_is_valid() and brief_structured
           - target: rejected
             event: reject
             guard: not brief_structured
