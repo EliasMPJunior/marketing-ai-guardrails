@@ -143,6 +143,19 @@ Capabilities that call Claude Code cost tokens. While these files exist at the r
 
 With the mocks the run goes through a split and ends in `published`. To use Claude Code, remove or rename the mocks and make sure `claude` is in the `PATH`. The checks that follow each capability are the same in both modes.
 
+## Tests
+
+```bash
+pytest
+```
+
+The suite was **written by Claude Code**. It has two parts:
+
+- `tests/test_scenarios.py` runs the real statechart, guards and capabilities end to end, with the expected outcome of each scenario stated in advance. It covers the valid demand (split, rescored, published), a demand with one strong step per task, an invalid brief, a task without a strong step, a split that does not resolve the ambiguity, scores that name a step missing from the ontology, a tasks listing that breaks its contract, garbage and invented steps coming from Claude Code, a failing and an absent Claude Code, and the consistency of `path.json`.
+- `tests/test_guards.py` tests the objective checks on their own: the inclusive threshold, the "at least one" and "exactly one" guards, unusable or missing scores, and the brief guard.
+
+Each scenario runs in a temporary copy of `fsm/` and `ontology/` with its own mocks and a fake `claude` executable, so the tests never touch the repository mocks and never spend tokens.
+
 ## Repository layout
 
 ```text
@@ -159,6 +172,7 @@ fsm/states/<state>/
 tasks.json, step_scores.json,
 subtasks.json                  Mocks (see above)
 discussions.md                 Design decisions
+tests/                         Scenario and guard tests (written by Claude Code)
 ```
 
 ## Future steps
@@ -171,7 +185,7 @@ The rest of the request in `prompt.txt` is design work still to be built on the 
 - **Consent and eligibility.** Recipients are filtered against consent records. A missing record is a failure, not a default.
 - **Rule validation with SHACL.** Express the shapes of products, offers and audiences as SHACL constraints and validate the data with pySHACL, keeping the rules separate from the code that generates content.
 - **Human review and authorization.** A review state for cases the rules cannot settle, and an explicit approval before anything is sent, with the reviewer's decision recorded in the trace.
-- **Scenario tests.** Automated runs with the expected outcome stated in advance, including a valid campaign, a policy violation, an unsupported claim and a case that needs human review.
+- **Business scenario tests.** Extend the scenario suite with a policy violation, an unsupported claim and a case that needs human review, once those checks exist.
 - **Human tasks workflow.** Replace the alert of `operation_unresolved` with an actual hand-off to the people who own the work.
 
 ## Limitations
@@ -180,4 +194,4 @@ The rest of the request in `prompt.txt` is design work still to be built on the 
 - Nothing is published or sent; `published` marks the end of the implemented slice.
 - The scoring depends on the labels of the ontology, so the quality of the plan description limits the quality of the match.
 - The mocks make the demonstration reproducible but cover one scenario. The behavior with Claude Code has been exercised only in a controlled way.
-- There is no automated test suite yet.
+- The tests cover the implemented slice only, and they exercise Claude Code through a fake executable, never the real one.
