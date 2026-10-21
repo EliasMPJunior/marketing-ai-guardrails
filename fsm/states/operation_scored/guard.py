@@ -1,4 +1,4 @@
-"""Objective checks for the ``operation_validated`` state.
+"""Objective checks for the ``operation_scored`` state.
 
 These checks read the step scores written to the run folder by the
 ``brief_structured`` capability. They only count scores against a threshold;

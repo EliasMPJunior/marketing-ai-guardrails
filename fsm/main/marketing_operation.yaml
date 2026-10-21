@@ -35,21 +35,21 @@ statechart:
         contract:
           - before: is_brief_structured
         transitions:
-          - target: operation_validated
+          - target: operation_scored
             guard: is_brief_structured
-            action: is_operation_validated = is_brief_structured and validate_tasks()
+            action: is_operation_scored = is_brief_structured and validate_tasks()
 
-      - name: operation_validated
+      - name: operation_scored
         contract:
-          - before: is_operation_validated
+          - before: is_operation_scored
         transitions:
           - target: published
-            guard: is_operation_validated
+            guard: is_operation_scored
 
       - name: published
         type: final
         contract:
-          - before: is_operation_validated
+          - before: is_operation_scored
 
       - name: rejected
         type: final
