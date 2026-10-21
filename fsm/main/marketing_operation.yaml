@@ -19,12 +19,13 @@ statechart:
     initial: brief_received
     states:
       - name: brief_received
+        # Entry action: runs the objective input checks from
+        # states/brief_received/guard.py and records the resulting fact.
+        on entry: brief_is_valid = prompt_is_valid()
         transitions:
           - target: brief_structured
-            event: structure_brief
-            # Validate the source prompt with states/brief_received/guard.py
-            # before allowing the already verified structured brief to advance.
-            guard: prompt_is_valid() and brief_structured
+            guard: brief_is_valid
+            action: interpret_brief()
           - target: rejected
             event: reject
             guard: not brief_structured
