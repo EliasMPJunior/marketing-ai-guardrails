@@ -9,8 +9,8 @@ from typing import Any, Callable, Dict, List
 from sismic.interpreter import Interpreter
 from sismic.io import import_from_yaml
 
-STATE_CHART_PATH: Path = Path(__file__).with_name("marketing-operation.yaml")
-BRIEF_GUARD_PATH: Path = Path(__file__).parent / "States" / "Brief Received" / "Guard.py"
+STATE_CHART_PATH: Path = Path(__file__).with_name("marketing_operation.yaml")
+BRIEF_GUARD_PATH: Path = Path(__file__).parent / "states" / "brief_received" / "guard.py"
 BRIEF_FILE_NAME: str = "brief.txt"
 DEFAULT_PROMPT_PATH: Path = Path(__file__).resolve().parents[2] / "prompt.txt"
 
