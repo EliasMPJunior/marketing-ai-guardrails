@@ -1,0 +1,38 @@
+@prefix : <http://datacenter.app.br/ontology/tool/ontobdc/individual/job.ttl#> .
+@prefix code: <http://datacenter.app.br/ontology/tool/ontobdc/core/code.ttl#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix obdc: <http://datacenter.app.br/ontology/tool/ontobdc/core/ns.ttl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix pko: <https://w3id.org/pko#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://datacenter.app.br/ontology/tool/ontobdc/individual/job.ttl>
+    rdf:type owl:Ontology ;
+    owl:imports
+        <http://datacenter.app.br/ontology/tool/ontobdc/core/ns.ttl> ,
+        <http://datacenter.app.br/ontology/tool/ontobdc/core/code.ttl> ;
+    rdfs:label "OntoBDC Job Individuals"@en ,
+        "Indivíduos de Job do OntoBDC"@pt-br ;
+    dcterms:description
+        "The procedures that the jobs of OntoBDC execute."@en ,
+        "Os procedimentos que os jobs do OntoBDC executam."@pt-br .
+
+#################################################################
+# Procedure: catalog the dates of the actions in the container
+#################################################################
+#
+# It executes a finite-state machine that exists as code in ontobdc-wip; the procedure target is
+# the id of that machine, in the pattern of the ids of the capabilities.
+#
+
+:CatalogActionDates
+    rdf:type obdc:Procedure ;
+    dcterms:identifier "catalog_action_dates" ;
+    rdfs:label "Catalog the dates of the actions in the container"@en ,
+        "Catalogar as datas das ações no container"@pt-br ;
+    dcterms:description
+        "Create a day for each distinct date of the timestamps that the RO-Crate of the container records for its files, and relate each file to the day of its date."@en ,
+        "Criar um dia para cada data distinta dos timestamps que o RO-Crate do container registra para seus arquivos, e relacionar cada arquivo ao dia de sua data."@pt-br ;
+    pko:hasProcedureType code:FiniteStateMachine ;
+    pko:hasProcedureTarget "org.ontobdc.context.plugin.machine.action_dates_catalog" .
